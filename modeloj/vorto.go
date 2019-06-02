@@ -23,17 +23,28 @@ func (Vorto) TableName() string {
 
 func (v *Vorto) Montri() {
 	silaboj, _ := iloj.Dividi(v.Vorto)
+	tipo := iloj.Tipo(silaboj[len(silaboj)-1])
 	fmt.Printf(
 		"%v (%v, %v): %v\n",
 		iloj.Normaligi(v.Vorto),
 		len(silaboj),
-		iloj.Tipo(silaboj[len(silaboj)-1]),
+		tipo,
 		v.Signifo.Signifo,
 	)
-	fmt.Printf("Prepozicioj: ")
-	for i, p := range gramatiko.Prepozicioj {
-		if (v.Ecoj >> uint(i)) & 1 == 1 {
-			fmt.Printf("%v ", p)
+	switch tipo {
+	case "substantivo":
+		fmt.Printf("Prepozicioj: ")
+		for i, p := range gramatiko.Prepozicioj {
+			if (v.Ecoj >> uint(i)) & 1 == 1 {
+				fmt.Printf("%v ", p)
+			}
+		}
+	case "verbo":
+		fmt.Printf("Kazoj: ")
+		for i, k := range gramatiko.Kazoj {
+			if (v.Ecoj >> uint(i)) & 1 == 1 {
+				fmt.Printf("%v ", k)
+			}
 		}
 	}
 	fmt.Printf("\n")

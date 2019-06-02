@@ -60,43 +60,41 @@ func Krei(db *gorm.DB) {
 		return radikoj
 	}
 
+	finaĵo := silaboj[len(silaboj)-1]
+
 	if !ekzistanta {
-		if _, ok := gramatiko.S1Finaĵoj[silaboj[len(silaboj)-1]]; ok {
-			fmt.Printf(
-				"La vorto estas substansivo, kiu finas per %v. Krei la vorton? (j/_)\n",
-				silaboj[len(silaboj)-1],
-			)
-			eniro, _ := eniroLegilo.ReadString('\n')
-			if strings.TrimSpace(eniro) == "j" {
-				var opcioj uint8 = 0
-				for i := range gramatiko.Prepozicioj {
-					fmt.Printf("%v? (j/_) ", gramatiko.Prepozicioj[i])
-					eniro, _ := eniroLegilo.ReadString('\n')
-					if strings.TrimSpace(eniro) == "j" {
-						opcioj = opcioj | (1 << uint(i))
+		if _, ok := gramatiko.ValidajFinaĵoj[finaĵo]; ok {
+			tipo := iloj.Tipo(finaĵo)
+			if k, _ := iloj.Demandi(fmt.Sprintf("La vorto estas %v, kiu finas per %v. Krei la vorton? (j/_)\n", tipo, finaĵo)); k {
+				radikoj := demandiRadikojn()
+				var opcioj []string
+				switch tipo {
+				case "substantivo":
+					opcioj = gramatiko.Prepozicioj
+				case "verbo":
+					opcioj = gramatiko.Kazoj
+				}
+				var elektoj uint8 = 0
+				for i, o := range opcioj {
+					if k2, _ := iloj.Demandi(fmt.Sprintf("%v? (j/_)", o)); k2 {
+						elektoj = elektoj | (1 << uint(i))
 					}
 				}
-
-				radikoj := demandiRadikojn()
 
 				vorto := modeloj.Vorto{
 					Vorto:     novaVorto,
 					SignifoID: s.ID,
 					Signifo:   s,
-					Ecoj:      opcioj,
+					Ecoj:      elektoj,
 					Radikoj:   radikoj,
 				}
+
 				fmt.Printf("Vi kreos: ")
 				vorto.Montri()
-				fmt.Printf("Konfirmi? (j/_) ")
-				eniro, _ = eniroLegilo.ReadString('\n')
-				if strings.TrimSpace(eniro) == "j" {
+
+				if k2, _ := iloj.Demandi("Konfirmi?"); k2 {
 					db.Create(&vorto)
-				} else {
-					fmt.Printf("Nuligis.\n")
 				}
-			} else {
-				fmt.Printf("Nuligis.\n")
 			}
 		} else {
 			fmt.Printf("La finaĵo %v ne estas valida.", silaboj[len(silaboj)-1])

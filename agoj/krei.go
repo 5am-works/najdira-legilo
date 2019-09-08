@@ -5,6 +5,7 @@ import (
 	"najdira_legilo/gramatiko"
 	"najdira_legilo/iloj"
 	"najdira_legilo/modeloj"
+	"regexp"
 
 	"bufio"
 	"fmt"
@@ -67,17 +68,24 @@ func Krei(db *gorm.DB) {
 			tipo := iloj.Tipo(finaĵo)
 			if k, _ := iloj.Demandi(fmt.Sprintf("La vorto estas %v, kiu finas per %v. Krei la vorton? (j/_)\n", tipo, finaĵo)); k {
 				radikoj := demandiRadikojn()
-				var opcioj []string
+				var elektoj uint8 = 0
 				switch tipo {
 				case "substantivo":
-					opcioj = gramatiko.Prepozicioj
+					opcioj := gramatiko.Prepozicioj
+					for i, o := range opcioj {
+						if k2, _ := iloj.Demandi(fmt.Sprintf("%v? (j/_)", o)); k2 {
+							elektoj = elektoj | (1 << uint(i))
+						}
+					}
 				case "verbo":
-					opcioj = gramatiko.Kazoj
-				}
-				var elektoj uint8 = 0
-				for i, o := range opcioj {
-					if k2, _ := iloj.Demandi(fmt.Sprintf("%v? (j/_)", o)); k2 {
-						elektoj = elektoj | (1 << uint(i))
+					for i, k := range gramatiko.Kazoj {
+						match, err := regexp.MatchString(fmt.Sprintf(`\W*%v\W*`, k), signifo)
+						if err != nil {
+							panic(err)
+						}
+						if match {
+							elektoj = elektoj | (1 << uint(i))
+						}
 					}
 				}
 

@@ -2,19 +2,19 @@ package modeloj
 
 import (
 	"github.com/jinzhu/gorm"
-	"najdira_legilo/iloj"
 	"najdira_legilo/gramatiko"
+	"najdira_legilo/iloj"
 
 	"fmt"
 )
 
 type Vorto struct {
 	gorm.Model
-	Vorto                string `gorm:"UNIQUE"`
-	SignifoID            uint `gorm:"NOT NULL"`
-	Signifo              Signifo
-	Ecoj uint8 `gorm:"NOT NULL";`
-	Radikoj              []*Vorto `gorm:"many2many:radikoj;association_jointable_foreignkey:radiko_id"`
+	Vorto     string `gorm:"UNIQUE"`
+	SignifoID uint   `gorm:"NOT NULL"`
+	Signifo   Signifo
+	Ecoj      uint8    `gorm:"NOT NULL"`
+	Radikoj   []*Vorto `gorm:"many2many:radikoj;association_jointable_foreignkey:radiko_id"`
 }
 
 func (Vorto) TableName() string {
@@ -35,14 +35,14 @@ func (v *Vorto) Montri() {
 	case "substantivo":
 		fmt.Printf("Prepozicioj: ")
 		for i, p := range gramatiko.Prepozicioj {
-			if (v.Ecoj >> uint(i)) & 1 == 1 {
+			if (v.Ecoj>>uint(i))&1 == 1 {
 				fmt.Printf("%v ", p)
 			}
 		}
 	case "verbo":
 		fmt.Printf("Kazoj: ")
 		for i, k := range gramatiko.Kazoj {
-			if (v.Ecoj >> uint(i)) & 1 == 1 {
+			if (v.Ecoj>>uint(i))&1 == 1 {
 				fmt.Printf("%v ", k)
 			}
 		}

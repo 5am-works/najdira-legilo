@@ -9,6 +9,8 @@ func Tipo(finaĵo string) string {
 		return "substantivo"
 	} else if _, ok := gramatiko.V0Finaĵoj[finaĵo]; ok {
 		return "verbo"
+	} else if _, ok := gramatiko.HelpvortoFinaĵoj[finaĵo]; ok {
+		return "helpvorto"
 	}
 
 	return "???"
